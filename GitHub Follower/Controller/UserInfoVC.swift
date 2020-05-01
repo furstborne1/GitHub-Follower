@@ -8,6 +8,11 @@
 
 import UIKit
 
+protocol UserInfoVCDelegate: class {
+    func didTapUserProfileButton()
+    func didTapFollowerButton()
+}
+
 class UserInfoVC: UIViewController {
     
     var containerView            = UIView()
@@ -49,14 +54,21 @@ class UserInfoVC: UIViewController {
             case .failure(let error):
                 print("\(error)")
             }
-            
-            DispatchQueue.main.async {
-                self.add(childVC: GFHeaderVC(user: self.user), to: self.containerView)
-                self.add(childVC: GFRepoItemVC(user: self.user), to: self.containerOne)
-                self.add(childVC: GFFollowerVC(user: self.user), to: self.containerTwo)
-                self.dateLabel.text = "GitHub since \( self.user.createdAt.displayDate())"
-            }
+            DispatchQueue.main.async { self.setupUIelement(user: self.user) }
         }
+    }
+    
+    func setupUIelement(user: User) {
+        let repoItemVC = GFRepoItemVC(user: user)
+        repoItemVC.delegate = self
+        
+        let followerInfoVC = GFFollowerVC(user: user)
+        followerInfoVC.delegate = self
+        
+        self.add(childVC: repoItemVC, to: self.containerOne)
+        self.add(childVC: followerInfoVC, to: self.containerTwo)
+        self.add(childVC: GFHeaderVC(user: self.user), to: self.containerView)
+        self.dateLabel.text = "GitHub since \( self.user.createdAt.displayDate())"
     }
     
     func setContainerView() {
@@ -98,6 +110,16 @@ class UserInfoVC: UIViewController {
         childVC.view.frame = containerView.bounds
         childVC.didMove(toParent: self)
     }
-    
 
+}
+extension UserInfoVC: UserInfoVCDelegate {
+    func didTapUserProfileButton() {
+        print("fuck you mark")
+    }
+    
+    func didTapFollowerButton() {
+        //
+    }
+    
+    
 }

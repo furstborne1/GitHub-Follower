@@ -160,15 +160,13 @@
 		492B723B244E25E600CAFC38 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				49646DBD245CD97300B09EF6 /* ItemInfoVC */,
 				49004CBD2449112D00F6595A /* SearchVC.swift */,
 				491892BA2449453C0009B328 /* FavoriteListVC.swift */,
 				491892C0244A74B40009B328 /* FollowerVC.swift */,
 				491892C2244A8E020009B328 /* GFAlertVC.swift */,
 				494F04452450DA9D00220106 /* UserInfoVC.swift */,
 				494F044724511CD200220106 /* GFHeaderVC.swift */,
-				49646DB1245A1A6C00B09EF6 /* GFItemInfoVC.swift */,
-				49646DB3245A245900B09EF6 /* GFRepoItemVC.swift */,
-				49646DB5245A280600B09EF6 /* GFFollowerVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -196,6 +194,16 @@
 				492B723D244E269C00CAFC38 /* GFCollectionViewCell.swift */,
 			);
 			path = Cell;
+			sourceTree = "<group>";
+		};
+		49646DBD245CD97300B09EF6 /* ItemInfoVC */ = {
+			isa = PBXGroup;
+			children = (
+				49646DB1245A1A6C00B09EF6 /* GFItemInfoVC.swift */,
+				49646DB3245A245900B09EF6 /* GFRepoItemVC.swift */,
+				49646DB5245A280600B09EF6 /* GFFollowerVC.swift */,
+			);
+			path = ItemInfoVC;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

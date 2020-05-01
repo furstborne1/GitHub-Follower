@@ -16,6 +16,7 @@ class GFItemInfoVC: UIViewController {
     let actionButton    = GFButton()
     
     var user: User!
+    var delegate: UserInfoVCDelegate!
     
     init(user: User) {
         super.init(nibName: nil, bundle: nil)
@@ -46,10 +47,12 @@ class GFItemInfoVC: UIViewController {
         stackView.addArrangedSubview(itemTwoView)
     }
     
+    
     private func setLayout() {
         let padding: CGFloat = 20
         view.addSubview(stackView)
         view.addSubview(actionButton)
+        actionButton.addTarget(self, action: #selector(actionButtondidPress), for: .touchUpInside)
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -66,6 +69,8 @@ class GFItemInfoVC: UIViewController {
         
         ])
     }
+    
+    @objc func actionButtondidPress() {}
 
 
 }

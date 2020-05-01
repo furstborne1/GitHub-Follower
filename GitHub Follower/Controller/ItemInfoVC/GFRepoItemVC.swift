@@ -20,4 +20,8 @@ class GFRepoItemVC: GFItemInfoVC {
         itemTwoView.set(infoItem: .follower, withCounter: user.followers)
         actionButton.set(backgroundColor: .systemPurple, title: "GitHub Profile")
     }
+    
+    override func actionButtondidPress() {
+        delegate.didTapUserProfileButton()
+    }
 }

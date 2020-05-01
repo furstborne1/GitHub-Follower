@@ -140,3 +140,23 @@ extension FollowerVC: UISearchResultsUpdating, UISearchBarDelegate {
         updataData(for: followers)
     }
 }
+
+
+import SwiftUI
+
+struct FollowerPreview: PreviewProvider {
+    
+    static var previews: some View {
+        ContainerView().edgesIgnoringSafeArea(.all)
+    }
+    
+    struct ContainerView: UIViewControllerRepresentable {
+
+        func makeUIViewController(context: UIViewControllerRepresentableContext<FollowerPreview.ContainerView>) -> UIViewController {
+            return FollowerVC()
+        }
+
+        func updateUIViewController(_ uiViewController: FollowerPreview.ContainerView.UIViewControllerType, context: UIViewControllerRepresentableContext<FollowerPreview.ContainerView>) {
+        }
+    }
+}
