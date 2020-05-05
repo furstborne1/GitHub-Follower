@@ -16,8 +16,12 @@ class GFFollowerVC: GFItemInfoVC {
     }
     
    private func setupView() {
-        itemOneView.set(infoItem: .gists, withCounter: user.publicGists)
+        itemOneView.set(infoItem: .follower, withCounter: user.followers)
         itemTwoView.set(infoItem: .following, withCounter: user.following)
         actionButton.set(backgroundColor: .systemGreen, title: "Get Followers")
+    }
+    
+    override func actionButtondidPress() {
+        delegate.didTapFollowerButton()
     }
 }

@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol FollowVCDelegate: class {
+    func didRequestFollowers(for username: String)
+}
+
 class FollowerVC: UIViewController {
     
     enum section { case main }
@@ -21,6 +25,16 @@ class FollowerVC: UIViewController {
     var isSearching = false
     
     var filteredFollowersArray = [Follower]()
+    
+    init(username: String) {
+        super.init(nibName: nil, bundle: nil)
+        self.username = username
+        title         = username
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,15 +53,43 @@ class FollowerVC: UIViewController {
     func configureViewController() {
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = true
+        
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addFavorite))
+        navigationItem.rightBarButtonItem = addButton
     }
     
     func configureSearchController() {
         let searchController = UISearchController()
-        searchController.searchResultsUpdater = self
-        searchController.searchBar.placeholder = "Search Follower"
-        searchController.searchBar.delegate =  self
-        searchController.obscuresBackgroundDuringPresentation = true
-        navigationItem.searchController = searchController
+        searchController.searchResultsUpdater                 = self
+        searchController.searchBar.placeholder                = "Search Follower"
+        searchController.searchBar.delegate                   = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        navigationItem.searchController                       = searchController
+    }
+    
+    @objc func addFavorite() {
+        showLoadingVC()
+        
+        NetworkManager.shared.getUser(userName: username) { [weak self] (result) in
+            guard let self = self else { return }
+            self.dismissLoadingView()
+            switch result {
+                
+            case .success(let user):
+                let favorite = Follower(login: user.login, avatarUrl: user.avatarUrl)
+                PersistentManger.updateWith(follower: favorite, update: .add) { [weak self] (error) in
+                    guard let self = self else { return }
+                    guard let error = error else {
+                        self.presentGFAlertVC(title: "Sucess", body: "Succesfully added to favorite 🎉", buttonTitle: "Hooray")
+                        return
+                    }
+                    self.presentGFAlertVC(title: "OH OH", body: error.rawValue, buttonTitle: "Ok")
+                }
+                
+            case .failure(let error):
+                self.presentGFAlertVC(title: "OH OH", body: error.rawValue, buttonTitle: "Ok")
+            }
+        }
     }
     
     func getFollowers(username: String, page: Int) {
@@ -106,11 +148,11 @@ class FollowerVC: UIViewController {
 
 extension FollowerVC: UICollectionViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
+        let offsetY         = scrollView.contentOffset.y
+        let contentHeight   = scrollView.contentSize.height
+        let height          = scrollView.frame.size.height
         
-        if offsetY > (contentHeight - height) {
+        if offsetY > contentHeight - height {
             guard hasFinishedLoading else { return }
             page += 1
             getFollowers(username: username, page: page)
@@ -121,6 +163,7 @@ extension FollowerVC: UICollectionViewDelegate {
         let activeArray = isSearching ? filteredFollowersArray : followers
         let follower = activeArray[indexPath.item]
         let destinationVC = UserInfoVC()
+        destinationVC.delegate = self
         destinationVC.follower = follower
         let navController = UINavigationController(rootViewController: destinationVC)
         present(navController, animated: true)
@@ -141,22 +184,18 @@ extension FollowerVC: UISearchResultsUpdating, UISearchBarDelegate {
     }
 }
 
-
-import SwiftUI
-
-struct FollowerPreview: PreviewProvider {
-    
-    static var previews: some View {
-        ContainerView().edgesIgnoringSafeArea(.all)
+extension FollowerVC: FollowVCDelegate {
+    func didRequestFollowers(for username: String) {
+        self.username = username
+        title         = username
+        page          = 1
+        followers.removeAll()
+        filteredFollowersArray.removeAll()
+        collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+        getFollowers(username: username, page: page)
     }
-    
-    struct ContainerView: UIViewControllerRepresentable {
 
-        func makeUIViewController(context: UIViewControllerRepresentableContext<FollowerPreview.ContainerView>) -> UIViewController {
-            return FollowerVC()
-        }
-
-        func updateUIViewController(_ uiViewController: FollowerPreview.ContainerView.UIViewControllerType, context: UIViewControllerRepresentableContext<FollowerPreview.ContainerView>) {
-        }
-    }
 }
+
+
+

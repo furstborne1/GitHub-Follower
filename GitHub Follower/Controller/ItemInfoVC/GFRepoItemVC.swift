@@ -17,7 +17,7 @@ class GFRepoItemVC: GFItemInfoVC {
     
    private func setupView() {
         itemOneView.set(infoItem: .repos, withCounter: user.publicRepos)
-        itemTwoView.set(infoItem: .follower, withCounter: user.followers)
+        itemTwoView.set(infoItem: .gists, withCounter: user.publicGists)
         actionButton.set(backgroundColor: .systemPurple, title: "GitHub Profile")
     }
     

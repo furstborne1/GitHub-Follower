@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SafariServices
 
 protocol UserInfoVCDelegate: class {
     func didTapUserProfileButton()
@@ -20,10 +21,13 @@ class UserInfoVC: UIViewController {
     var containerTwo             = UIView()
     var dateLabel                = GFBodyLabel(textAlignment: .center)
     var containerArray: [UIView] = []
+    let scrollView               = UIScrollView()
+    let contentView              = UIView()
     
     
     var user : User!
     var follower: Follower!
+    var delegate: FollowVCDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +35,7 @@ class UserInfoVC: UIViewController {
         doneButtonForNavController()
         setContainerView()
         getUser()
+        configureScrollView()
     }
     
     func doneButtonForNavController() {
@@ -41,6 +46,18 @@ class UserInfoVC: UIViewController {
     
     @objc func dismissVC() {
         dismiss(animated: true)
+    }
+    
+    func configureScrollView() {
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        scrollView.pinEdges(to: view)
+        contentView.pinEdges(to: scrollView)
+        
+        NSLayoutConstraint.activate([
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(equalToConstant: view.frame.size.height)
+        ])
     }
     
     func getUser() {
@@ -77,19 +94,19 @@ class UserInfoVC: UIViewController {
         
         containerArray = [containerView, containerOne, containerTwo, dateLabel]
         for containers in containerArray {
-            view.addSubview(containers)
+            contentView.addSubview(containers)
             containers.translatesAutoresizingMaskIntoConstraints = false
         
             NSLayoutConstraint.activate([
-                containers.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
-                containers.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
+                containers.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+                containers.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             ])
         }
 
         containerView.backgroundColor = .tertiarySystemBackground
         
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            containerView.topAnchor.constraint(equalTo: contentView.topAnchor),
             containerView.heightAnchor.constraint(equalToConstant: 200),
             
             containerOne.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: padding),
@@ -114,11 +131,21 @@ class UserInfoVC: UIViewController {
 }
 extension UserInfoVC: UserInfoVCDelegate {
     func didTapUserProfileButton() {
-        print("fuck you mark")
+        guard let url = URL(string: user.htmlUrl) else {
+            presentGFAlertVC(title: "OH OH bad URL", body: "this user url is not valid. Please try again later", buttonTitle: "ok")
+            return
+        }
+        presentSafariViewComntroller(with: url)
+        
     }
     
     func didTapFollowerButton() {
-        //
+        guard user.followers != 0 else {
+            presentGFAlertVC(title: "OHOH", body: "This user has no followers 😡", buttonTitle: "What a shame!")
+            return
+        }
+        delegate.didRequestFollowers(for: user.login)
+        dismissVC()
     }
     
     

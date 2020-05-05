@@ -57,39 +57,40 @@ class NetworkManager {
     
     
     func getUser(userName: username, completion: @escaping(Result<User, GFError>) -> ()) {
-           let endpoint = baseURL + "\(userName)"
-           guard let url = URL(string: endpoint) else {
-               completion(.failure(.invalidRequestErrorMessage))
-               return
-           }
-           let session = URLSession.shared.dataTask(with: url) { (data, response, error) in
-               if let _ = error {
-                   completion(.failure( .checkInternetConnectionError))
-                   return
-               }
-               
-               guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                   completion(.failure(.invalidResponseFromServer))
-                   return
-               }
-               
-               guard let data = data else {
-                   completion(.failure(.invalidData))
-                   return
-               }
-               
-               do {
-                   let decoder = JSONDecoder()
-                   decoder.keyDecodingStrategy = .convertFromSnakeCase
-                   let user = try decoder.decode(User.self, from: data)
-                   completion(.success(user))
-               } catch {
-                   print(error.localizedDescription)
-                   completion(.failure(.invalidData))
-               }
-           }
-           session.resume()
-       }
+        let endpoint = baseURL + "\(userName)"
+        guard let url = URL(string: endpoint) else {
+            completion(.failure(.invalidRequestErrorMessage))
+            return
+        }
+        let session = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let _ = error {
+                completion(.failure( .checkInternetConnectionError))
+                return
+            }
+            
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+                completion(.failure(.invalidResponseFromServer))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(.invalidData))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.dateDecodingStrategy = .iso8601
+                let user = try decoder.decode(User.self, from: data)
+                completion(.success(user))
+            } catch {
+                print(error.localizedDescription)
+                completion(.failure(.invalidData))
+            }
+        }
+        session.resume()
+    }
     
     
 }

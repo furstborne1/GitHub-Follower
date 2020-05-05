@@ -13,6 +13,7 @@ class SearchVC: UIViewController {
     let logoImageView = UIImageView()
     let usernameTextField = GFTextField()
     let callToActionButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
+    var logoImageViewConstraint : NSLayoutConstraint!
     
     var isUsernameEmpty: Bool {
         return !usernameTextField.text!.isEmpty
@@ -33,10 +34,11 @@ class SearchVC: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         usernameTextField.resignFirstResponder()
+        usernameTextField.text = ""
     }
     
     func tapGestureToDismisskeyboard() {
-        let tapGesture = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
+        let tapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing(_:)))
         view.addGestureRecognizer(tapGesture)
     }
     
@@ -52,9 +54,7 @@ class SearchVC: UIViewController {
             print("No UserName")
             return
         }
-        let followerVC = FollowerVC()
-        followerVC.title = usernameTextField.text
-        followerVC.username = usernameTextField.text
+        let followerVC = FollowerVC(username: usernameTextField.text!)
         navigationController?.pushViewController(followerVC, animated: true)
     }
     
@@ -63,8 +63,11 @@ class SearchVC: UIViewController {
         logoImageView.image = UIImage(named: "gh-logo")
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         
+        let topConstraint: CGFloat = DeviceTypes.isiPhoneSE || DeviceTypes.isiPhone8Zoomed ? 20 : 80
+        
+        logoImageViewConstraint = logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topConstraint)
+        logoImageViewConstraint.isActive = true
         NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
             logoImageView.widthAnchor.constraint(equalToConstant: 200),
             logoImageView.heightAnchor.constraint(equalToConstant: 200),
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
